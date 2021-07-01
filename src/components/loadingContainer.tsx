@@ -1,68 +1,84 @@
-import React, { useState } from "react";
-import { useSpring, animated, useTrail } from "react-spring";
+import { AnimateDispatch, AnimateState, useApi } from "./animateContainer";
+import React, { useRef } from "react";
+import {
+  useSpring,
+  animated,
+  AnimationResult,
+  SpringValue,
+} from "react-spring";
 
-export const LoadingContainer = () => {
-  const [firstPhaseFinished, setFirstPhaseFinished] = useState(false);
+export type LoadingContainerProps = {
+  state: AnimateState;
+  dispatch: AnimateDispatch;
+};
 
+export const LoadingContainer = ({
+  dispatch,
+  state,
+}: LoadingContainerProps) => {
   return (
-    <div className="h-[155px] w-[310px] bg-white rounded-md flex flex-col justify-center overflow-hidden">
-      <div className="relative">
-        <Tile
-          index={1}
-          firstPhaseFinished={firstPhaseFinished}
-          setFirstPhaseFinished={setFirstPhaseFinished}
-        />
-        <Tile
-          index={2}
-          firstPhaseFinished={firstPhaseFinished}
-          setFirstPhaseFinished={setFirstPhaseFinished}
-        />
-        <Tile
-          index={3}
-          firstPhaseFinished={firstPhaseFinished}
-          setFirstPhaseFinished={setFirstPhaseFinished}
-        />
-        <Tile
-          index={4}
-          firstPhaseFinished={firstPhaseFinished}
-          setFirstPhaseFinished={setFirstPhaseFinished}
-        />
-      </div>
+    <div className="relative">
+      <Tile index={1} dispatch={dispatch} state={state} />
+      <Tile index={3} dispatch={dispatch} state={state} />
+      <Tile index={4} dispatch={dispatch} state={state} />
+      <Tile index={2} dispatch={dispatch} state={state} />
     </div>
   );
 };
 
 type TileProps = {
   index: 1 | 2 | 3 | 4;
-  firstPhaseFinished: boolean;
-  setFirstPhaseFinished: (s: boolean) => void;
+  dispatch: React.Dispatch<
+    React.SetStateAction<"loading-1" | "loading-2" | "data-loaded">
+  >;
+  state: "loading-1" | "loading-2" | "data-loaded";
 };
 
-const Tile = ({
-  index,
-  firstPhaseFinished,
-  setFirstPhaseFinished,
-}: TileProps) => {
+const Tile = ({ index, dispatch, state }: TileProps) => {
+  const api = useApi();
+
+  const animateHeight = useRef(false);
+
   const { x: x1, ...styles } = useSpring({
     from: {
-      x: firstPhaseFinished ? 50 : 0,
-      skewX: firstPhaseFinished ? 0 : 20,
+      x: state === "loading-2" ? 50 : 0,
+      skewX: state === "loading-2" ? 0 : 20,
     },
+
     to: {
-      x: firstPhaseFinished ? 110 : 50,
-      skewX: firstPhaseFinished ? 20 : 0,
+      x: state === "loading-2" ? 110 : 50,
+      skewX: state === "loading-2" ? 20 : 0,
     },
+    reset: true,
+
     config: {
       tension: 200,
       friction: 30,
       clamp: true,
       mass: 0.5,
     },
-    delay: getDelayForTile(index, firstPhaseFinished),
+    delay: getDelayForTile(index, state === "loading-2"),
+
     onRest() {
-      if (!firstPhaseFinished && index === 3) {
-        setFirstPhaseFinished(true);
+      if (state !== "loading-2" && index === 3) {
+        dispatch("loading-2");
         return;
+      }
+
+      // if (state === "loading-2" && index === 3) {
+      //   dispatch("data-loaded");
+      //   return;
+      // }
+    },
+
+    onChange(res) {
+      if (res.value.x >= 105 && index === 3 && !animateHeight.current) {
+        animateHeight.current = true;
+        api.start({ height: 60 });
+      }
+
+      if (res.value.x >= 105 && index === 3 && state === "loading-2") {
+        dispatch("data-loaded");
       }
     },
   });
@@ -96,12 +112,12 @@ const getDelayForTile = (
 ): number => {
   switch (index) {
     case 1:
-      return firstPhaseFinished ? 400 + getDelayForTile(3, false) : 250;
+      return firstPhaseFinished ? 400 + getDelayForTile(3, false) : 150;
     case 2:
       return firstPhaseFinished ? 400 + getDelayForTile(4, false) : 0;
     case 3:
-      return firstPhaseFinished ? 400 + getDelayForTile(1, false) : 400;
+      return firstPhaseFinished ? 400 + getDelayForTile(1, false) : 300;
     case 4:
-      return firstPhaseFinished ? 400 + getDelayForTile(2, false) : 300;
+      return firstPhaseFinished ? 400 + getDelayForTile(2, false) : 200;
   }
 };
