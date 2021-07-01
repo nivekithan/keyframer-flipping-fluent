@@ -1,0 +1,8 @@
+.tile-grid-template {
+  grid-template-columns: 10px 10px;
+  grid-template-rows: 10px 10px;
+}
+
+.transform-border-box {
+  transform-box: border-box;
+}
