@@ -8,29 +8,49 @@ type HeadingProps = {
 };
 
 export const Heading = ({ dispatch, state }: HeadingProps) => {
-  const [{ x }, api] = useSpring(() => ({
+  const api = useApi();
+
+  const [{ x }] = useSpring(() => ({
     from: {
       x: 0,
+      opacity: 0,
     },
     to: {
       x: 40,
+      opacity: 1,
     },
 
     config: {
       friction: 75,
     },
 
-    onRest() {
-      if (state !== "fullscreen") {
+    onChange(res) {
+      if (res.value.x > 32 && state !== "fullscreen") {
         dispatch("fullscreen");
+        api.start({ to: { width: 80, height: 80 } });
       }
     },
   }));
 
+  const { opacity } = useSpring({
+    from: {
+      opacity: 0,
+    },
+    to: {
+      opacity: 1,
+    },
+    config: {
+      friction: 125,
+    },
+  });
+
   return (
     <animated.h1
-      className="text-5xl font-bold tracking-wide "
-      style={{ transform: x.to((x) => `translateX(${x}%)`) }}
+      className="text-5xl font-bold tracking-wide"
+      style={{
+        transform: x.to((x) => `translateX(${x}%)`),
+        opacity: opacity.to((o) => o),
+      }}
     >
       7 New Mails
     </animated.h1>

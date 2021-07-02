@@ -9,30 +9,30 @@ import {
 
 export type LoadingContainerProps = {
   state: AnimateState;
-  dispatch: AnimateDispatch;
+  setState: AnimateDispatch;
 };
 
 export const LoadingContainer = ({
-  dispatch,
+  setState,
   state,
 }: LoadingContainerProps) => {
   return (
     <div className="relative">
-      <Tile index={1} dispatch={dispatch} state={state} />
-      <Tile index={3} dispatch={dispatch} state={state} />
-      <Tile index={4} dispatch={dispatch} state={state} />
-      <Tile index={2} dispatch={dispatch} state={state} />
+      <Tile index={1} setState={setState} state={state} />
+      <Tile index={3} setState={setState} state={state} />
+      <Tile index={4} setState={setState} state={state} />
+      <Tile index={2} setState={setState} state={state} />
     </div>
   );
 };
 
 type TileProps = {
   index: 1 | 2 | 3 | 4;
-  dispatch: React.Dispatch<React.SetStateAction<AnimateState>>;
+  setState: React.Dispatch<React.SetStateAction<AnimateState>>;
   state: AnimateState;
 };
 
-const Tile = ({ index, dispatch, state }: TileProps) => {
+const Tile = ({ index, setState, state }: TileProps) => {
   const api = useApi();
 
   const animateHeight = useRef(false);
@@ -59,7 +59,7 @@ const Tile = ({ index, dispatch, state }: TileProps) => {
 
     onRest() {
       if (state !== "loading-2" && index === 3) {
-        dispatch("loading-2");
+        setState("loading-2");
         return;
       }
       
@@ -76,7 +76,7 @@ const Tile = ({ index, dispatch, state }: TileProps) => {
       }
 
       if (res.value.x >= 105 && index === 3 && state === "loading-2") {
-        dispatch("data-loaded");
+        setState("data-loaded");
       }
     },
   });

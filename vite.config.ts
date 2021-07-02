@@ -10,6 +10,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "~svg": path.resolve(__dirname, "src", "svg"),
+      src: path.resolve(__dirname, "src"),
     },
   },
 });

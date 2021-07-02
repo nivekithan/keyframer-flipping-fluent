@@ -8,7 +8,8 @@ export type AnimateState =
   | "loading-1"
   | "loading-2"
   | "data-loaded"
-  | "fullscreen";
+  | "fullscreen"
+  | "show";
 
 export type AnimateDispatch = React.Dispatch<
   React.SetStateAction<AnimateState>
@@ -30,14 +31,24 @@ export const useApi = () => {
 };
 
 export const AnimateContainer = () => {
-  const [state, dispatch] = useState<AnimateState>("loading-1");
+  const [state, setState] = useState<AnimateState>("loading-1");
 
-  const [{ height: x, width }, api] = useSpring(() => ({
-    from: { height: 80, width: 80 },
-    config: {
-      friction: 75,
-    },
-  }));
+  const [{ height: x, width }, api] = useSpring(
+    () => ({
+      from: { height: 10, width: 10 },
+      config: {
+        friction: 90,
+      },
+
+      onChange(res) {
+        if (res.value.width > 70 && state === "fullscreen") {
+          console.log(res)
+          setState("show");
+        }
+      },
+    }),
+    [state]
+  );
 
   return (
     <apiContext.Provider value={api}>
@@ -50,15 +61,23 @@ export const AnimateContainer = () => {
           width: width.to((w) => `${w}%`),
         }}
       >
-        {/* {isStateLoading(state) ? (
-          <LoadingContainer dispatch={dispatch} state={state} />
-        ) : state === "data-loaded" ? (
-          <Heading state={state} dispatch={dispatch} />
-        ) : (
-          <FullScreen />
-        )} */}
+        {(() => {
+          if (isStateLoading(state)) {
+            return <LoadingContainer setState={setState} state={state} />;
+          }
 
-        <FullScreen />
+          if (state === "data-loaded") {
+            return <Heading state={state} dispatch={setState} />;
+          }
+
+          if (state === "fullscreen") {
+            return <FullScreen showContent={false} />;
+          }
+
+          if (state === "show") {
+            return <FullScreen showContent />;
+          }
+        })()}
       </animated.div>
     </apiContext.Provider>
   );
