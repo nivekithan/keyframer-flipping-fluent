@@ -6,3 +6,11 @@
 .transform-border-box {
   transform-box: border-box;
 }
+
+.email-heading {
+  grid-template: repeat(2, 20px)/ 1fr 40px;
+}
+
+.shadow-container {
+  box-shadow: -8px 0px 15px 0px rgba(0, 0, 0, 0.1) ;
+}

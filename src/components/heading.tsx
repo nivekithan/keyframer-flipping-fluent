@@ -1,24 +1,35 @@
 import React from "react";
 import { useSpring, animated } from "react-spring";
-import { useApi } from "./animateContainer";
+import { AnimateState, useApi } from "./animateContainer";
 
-export const Heading = () => {
+type HeadingProps = {
+  dispatch: React.Dispatch<React.SetStateAction<AnimateState>>;
+  state: AnimateState;
+};
+
+export const Heading = ({ dispatch, state }: HeadingProps) => {
   const [{ x }, api] = useSpring(() => ({
     from: {
       x: 0,
     },
     to: {
-      x: 20,
+      x: 40,
     },
 
     config: {
-      friction: 50,
+      friction: 75,
+    },
+
+    onRest() {
+      if (state !== "fullscreen") {
+        dispatch("fullscreen");
+      }
     },
   }));
 
   return (
     <animated.h1
-      className="text-5xl font-bold "
+      className="text-5xl font-bold tracking-wide "
       style={{ transform: x.to((x) => `translateX(${x}%)`) }}
     >
       7 New Mails

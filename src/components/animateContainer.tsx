@@ -2,8 +2,14 @@ import React, { useState, useEffect, useContext } from "react";
 import { LoadingContainer } from "./loadingContainer";
 import { useSpring, animated, SpringRef } from "react-spring";
 import { Heading } from "./heading";
+import { FullScreen } from "./fullscreen/fullscreen";
 
-export type AnimateState = "loading-1" | "loading-2" | "data-loaded";
+export type AnimateState =
+  | "loading-1"
+  | "loading-2"
+  | "data-loaded"
+  | "fullscreen";
+
 export type AnimateDispatch = React.Dispatch<
   React.SetStateAction<AnimateState>
 >;
@@ -27,7 +33,7 @@ export const AnimateContainer = () => {
   const [state, dispatch] = useState<AnimateState>("loading-1");
 
   const [{ height: x, width }, api] = useSpring(() => ({
-    from: { height: 30, width: 10 },
+    from: { height: 80, width: 80 },
     config: {
       friction: 75,
     },
@@ -44,11 +50,15 @@ export const AnimateContainer = () => {
           width: width.to((w) => `${w}%`),
         }}
       >
-        {isStateLoading(state) ? (
+        {/* {isStateLoading(state) ? (
           <LoadingContainer dispatch={dispatch} state={state} />
+        ) : state === "data-loaded" ? (
+          <Heading state={state} dispatch={dispatch} />
         ) : (
-          <Heading />
-        )}
+          <FullScreen />
+        )} */}
+
+        <FullScreen />
       </animated.div>
     </apiContext.Provider>
   );

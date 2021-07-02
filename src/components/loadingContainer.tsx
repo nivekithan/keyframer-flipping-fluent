@@ -28,10 +28,8 @@ export const LoadingContainer = ({
 
 type TileProps = {
   index: 1 | 2 | 3 | 4;
-  dispatch: React.Dispatch<
-    React.SetStateAction<"loading-1" | "loading-2" | "data-loaded">
-  >;
-  state: "loading-1" | "loading-2" | "data-loaded";
+  dispatch: React.Dispatch<React.SetStateAction<AnimateState>>;
+  state: AnimateState;
 };
 
 const Tile = ({ index, dispatch, state }: TileProps) => {
@@ -64,7 +62,7 @@ const Tile = ({ index, dispatch, state }: TileProps) => {
         dispatch("loading-2");
         return;
       }
-
+      
       // if (state === "loading-2" && index === 3) {
       //   dispatch("data-loaded");
       //   return;
